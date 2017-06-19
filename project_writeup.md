@@ -37,26 +37,38 @@ You're reading it!
 
 ####1. Explain how (and identify where in your code) you extracted HOG features from the training images.
 
-The code for this step is contained in the first code cell of the IPython notebook (or in lines # through # of the file called `some_file.py`).  
+HOG, color spatial, and color histogram feature extraction methods are located in the 3rd cell of the IPython notebook `vehicle_detection.ipynb`  
 
-I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an example of one of each of the `vehicle` and `non-vehicle` classes:
+I started by reading in all the `vehicle` and `non-vehicle` images into a glob, then used the methods `get_hog_features()`, `bin_spatial()`, and `color_hist()` to extract the features of a random image from each set and display them with matplotlib.
 
-![alt text][image1]
-
-I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
-
-Here is an example using the `YCrCb` color space and HOG parameters of `orientations=8`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
-
+The methods `get_hog_features()`, `bin_spatial()`, and `color_hist()` use `skimage.feature.hog()`, `np.ravel()`, and `np.histogram()` respectively to extract the corresponding features. These three methods were used collectively in both `extract_features()` and `single_image_features()` and concatenated to create the feature set to be used by the classifier in the next section. Example ouput can be seen below:
 
 ![alt text][image2]
 
 ####2. Explain how you settled on your final choice of HOG parameters.
 
-I tried various combinations of parameters and...
+The hyperparameters of 
+
+```python
+color_space = 'LUV' # Can be RGB, HSV, LUV, HLS, YUV, YCrCb
+orient = 9  # HOG orientations
+pix_per_cell = 8 # HOG pixels per cell
+cell_per_block = 2 # HOG cells per block
+hog_channel = 0 # Can be 0, 1, 2, or "ALL"
+spatial_size = (16, 16) # Spatial binning dimensions
+hist_bins = 16    # Number of histogram bins
+spatial_feat = True # Spatial features on or off
+hist_feat = False # Histogram features on or off
+hog_feat = True # HOG features on or off
+```
+
+were chosen for these methods based on experimentation in the lesson quizzes.
+
+The selection process was a matter of trial and error and educated guessing to see which combinations yeilded the highest accuracy while not making the feature array too large, as docker couldn't handle the amount of memory while training the SVM in the next section. 
 
 ####3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
-I trained a linear SVM using...
+In the 4th cell of the IPython notebook, I trained a linear SVM using the `LinearSVC()` classifier with its default parameter of `C=1.0` by fitting it with features extracted by `extract_features()` on both the vehicles and non-vehicles sets scaled using `StandardScaler()` from sklearn.
 
 ###Sliding Window Search
 
